@@ -35,7 +35,8 @@ jobs:
         echo "PRODUCT_BUNDLE_IDENTIFIER=com.yourname.blink" >> developer_setup.xcconfig
 
     - name: Clean build folder
-      run: xcodebuild clean \
+      run: |
+        xcodebuild clean \
         -project Blink.xcodeproj \
         -scheme Blink \
         -configuration Release
