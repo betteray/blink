@@ -9,8 +9,7 @@ jobs:
     timeout-minutes: 60
 
     steps:
-    - name: Checkout repo with submodules
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
       with:
         submodules: recursive
 
@@ -35,11 +34,7 @@ jobs:
         echo "PRODUCT_BUNDLE_IDENTIFIER=com.yourname.blink" >> developer_setup.xcconfig
 
     - name: Clean build folder
-      run: |
-        xcodebuild clean \
-        -project Blink.xcodeproj \
-        -scheme Blink \
-        -configuration Release
+      run: xcodebuild clean -project Blink.xcodeproj -scheme Blink -configuration Release
 
     - name: Build archive unsigned
       run: |
@@ -54,7 +49,6 @@ jobs:
           CODE_SIGNING_ALLOWED=NO \
           ONLY_ACTIVE_ARCH=NO \
           IPHONEOS_DEPLOYMENT_TARGET='16.1' \
-          -disableAutomaticFrameworkDependencyResolution YES \
           -xcconfig developer_setup.xcconfig
 
     - name: Package unsigned IPA
