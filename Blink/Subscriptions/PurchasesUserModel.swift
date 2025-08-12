@@ -117,8 +117,6 @@ class PurchasesUserModel: ObservableObject {
   func blinkPlusBuildTrialAvailable() -> Bool {
     return true  // 始终可以试用 Blink+ Build
   }
-    blinkPlusBuildTrial?.status == IntroEligibilityStatus.eligible
-  }
 
   func blinkPlusIntroOfferAvailable() -> Bool {
     return true  // 始终可以使用介绍优惠
