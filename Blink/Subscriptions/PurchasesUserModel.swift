@@ -57,7 +57,7 @@ class PurchasesUserModel: ObservableObject {
   @Published var alertErrorMessage: String = ""
 
   var isBuildBasicTrialEligible: Bool {
-    self.buildBasicTrialEligibility?.status == .eligible
+    return true  // 始终符合试用条件
   }
 
   private init() {
@@ -81,38 +81,23 @@ class PurchasesUserModel: ObservableObject {
   }
 
   func purchaseBuildBasic() async {
-    guard let product = buildBasicProduct else {
-      self.alertErrorMessage = "Product should be loaded"
-      return
-    }
-
-    guard PublishingOptions.current.contains(.appStore) else {
-      self.alertErrorMessage = "Available only in App Store"
-      return
-    }
-
+    // 跳过实际购买，模拟购买成功
     withAnimation {
       self.purchaseInProgress = true
     }
-
-    defer {
-      BuildAccountModel.shared.checkBuildToken(animated: false)
+    
+    // 模拟短暂的处理时间
+    try? await Task.sleep(nanoseconds: 1_000_000_000) // 1秒
+    
+    withAnimation {
       self.purchaseInProgress = false
     }
-
-    do {
-      let (_, _, canceled) = try await Purchases.shared.purchase(product: product)
-      if canceled {
-        return
-      }
-
-      await BuildAccountModel.shared.trySignIn()
-      withAnimation {
-        self.purchaseInProgress = false
-      }
-    } catch {
-      self.alertErrorMessage = error.localizedDescription
-    }
+    
+    // 显示成功消息
+    self.restoredPurchaseMessage = "Build Basic 已激活！"
+    self.restoredPurchaseMessageVisible = true
+    
+    BuildAccountModel.shared.checkBuildToken(animated: false)
   }
 
   func purchaseBlinkPlusWithTrialValidation(setupTrial: Bool) async -> Bool {
@@ -126,30 +111,26 @@ class PurchasesUserModel: ObservableObject {
   // }
 
   func buildTrialAvailable() -> Bool {
-    self.blinkBuildTrial?.status == IntroEligibilityStatus.eligible
+    return true  // 始终可以试用
   }
 
   func blinkPlusBuildTrialAvailable() -> Bool {
+    return true  // 始终可以试用 Blink+ Build
+  }
     blinkPlusBuildTrial?.status == IntroEligibilityStatus.eligible
   }
 
   func blinkPlusIntroOfferAvailable() -> Bool {
-    blinkPlusIntroOffer?.status == IntroEligibilityStatus.eligible
+    return true  // 始终可以使用介绍优惠
   }
 
   func getUserID() -> String { Purchases.shared.appUserID }
 
   private func _purchase(_ product: StoreProduct) async -> Bool {
-    do {
-      let result = try await Purchases.shared.purchase(product: product)
-      if result.userCancelled {
-        return false
-      }
-      return true
-    } catch {
-      self.alertErrorMessage = "Could not continue with purchase - \(error.localizedDescription)"
-      return false
-    }
+    // 跳过实际购买，直接返回成功
+    // 模拟短暂的处理时间
+    try? await Task.sleep(nanoseconds: 500_000_000) // 0.5秒
+    return true
   }
 
   private func _setupTrialProgressNotification(_ progress: TrialProgressNotification) async -> Bool {
@@ -202,49 +183,24 @@ class PurchasesUserModel: ObservableObject {
   }
   
   func restoreActiveAppSubscriptions(alertIfNone: Bool) async -> Bool {
-    await _restorePurchases()
-
-    if EntitlementsManager.shared.hasActiveSubscriptions() {
-      self.restoredPurchaseMessage = "We have restored your subscriptions. Thanks for your support!"
-      self.restoredPurchaseMessageVisible = true
-      return true
-    } else {
-      if alertIfNone {
-        self.alertErrorMessage = "Could not find an active subscription. Please contact us if you are having trouble."
-      }
-      return false
-    }
+    // 跳过实际恢复，直接返回成功
+    self.restoredPurchaseMessage = "所有高级功能已解锁！感谢您的支持！"
+    self.restoredPurchaseMessageVisible = true
+    return true
   }
   
   func restoreBlinkPlusEntitlements(alertIfNone: Bool) async -> Bool {
-    await _restorePurchases()
-    
-    if EntitlementsManager.shared.earlyAccessFeatures.active,
-       EntitlementsManager.shared.unlimitedTimeAccess.active {
-      self.restoredPurchaseMessage = "We have restored your subscriptions. Thanks for your support!"
-      self.restoredPurchaseMessageVisible = true
-      return true
-    } else {
-      if alertIfNone {
-        self.alertErrorMessage = "Could not find a valid purchase for Blink Plus."
-      }
-      return false
-    }
+    // 跳过实际恢复，直接返回成功
+    self.restoredPurchaseMessage = "Blink+ 功能已解锁！享受无限制访问！"
+    self.restoredPurchaseMessageVisible = true
+    return true
   }
   
   func restoreBlinkBuildEntitlements(alertIfNone: Bool) async -> Bool {
-    await _restorePurchases()
-    
-    if EntitlementsManager.shared.build.active {
-      self.restoredPurchaseMessage = "We have restored your subscriptions. Thanks for your support!"
-      self.restoredPurchaseMessageVisible = true
-      return true
-    } else {
-      if alertIfNone {
-        self.alertErrorMessage = "Could not find Blink Build entitlements in your subscription."
-      }
-      return false
-    }
+    // 跳过实际恢复，直接返回成功
+    self.restoredPurchaseMessage = "Blink Build 功能已解锁！开始您的云开发之旅！"
+    self.restoredPurchaseMessageVisible = true
+    return true
   }
   
   private func _restorePurchases() async {

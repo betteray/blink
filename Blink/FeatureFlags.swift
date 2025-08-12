@@ -32,14 +32,12 @@
 
 import Foundation
 
-// Feature flags definition
+// Feature flags definition - 解锁版本：启用所有功能
 extension FeatureFlags {
-  @objc static let noSubscriptionNag     = _enabled(for: .developer, .testFlight)
-  @objc static let blinkBuild            = _enabled(for: .developer, .testFlight)
-  @objc static let blinkBuildStaging     = _enabled(for: .developer, .testFlight)
-//  @objc static let checkReceipt          = _enabled(for: .legacy)
-  @objc static let earlyAccessFeatures   = _enabled(for: .developer, .testFlight)
-//  @objc static let earlyAccessFeatures   = _enabled(for: .legacy)
+  @objc static let noSubscriptionNag     = true  // 禁用订阅提醒
+  @objc static let blinkBuild            = true  // 启用 Blink Build 功能
+  @objc static let blinkBuildStaging     = true  // 启用 Build 测试环境
+  @objc static let earlyAccessFeatures   = true  // 启用早期访问功能
 }
 
 struct PublishingOptions: OptionSet, CustomStringConvertible, CustomDebugStringConvertible {

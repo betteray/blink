@@ -75,9 +75,9 @@ public class EntitlementsManager: ObservableObject, EntitlementsSourceDelegate {
   
   public static let shared = EntitlementsManager([AppStoreEntitlementsSource()])
   
-  @Published var unlimitedTimeAccess: Entitlement = .inactiveUnlimitedScreenTime
-  @Published var earlyAccessFeatures: Entitlement = .earlyAccessFeatures
-  @Published var build: Entitlement = .build
+  @Published var unlimitedTimeAccess: Entitlement = Entitlement(id: UnlimitedScreenTimeEntitlementID, active: true, unlockProductID: nil, period: .Normal)
+  @Published var earlyAccessFeatures: Entitlement = Entitlement(id: EarlyAccessFeaturesEntitlementID, active: true, unlockProductID: nil, period: .Normal)
+  @Published var build: Entitlement = Entitlement(id: BuildEntitlementID, active: true, unlockProductID: nil, period: .Normal)
   
   @Published var activeSubscriptions: Set<String> = .init()
   @Published var nonSubscriptionTransactions: Set<String> = .init()
@@ -149,24 +149,13 @@ public class EntitlementsManager: ObservableObject, EntitlementsSourceDelegate {
   }
   
   public func customerTier() -> CustomerTier {
-    if activeSubscriptions.contains(ProductBlinkShellPlusID)  || activeSubscriptions.contains(ProductBlinkPlusID)
-        || activeSubscriptions.contains(ProductBlinkPlusBuildBasicID)
-    {
-      return CustomerTier.Plus
-    }
-    if nonSubscriptionTransactions.contains(ProductBlinkShellClassicID) {
-      return CustomerTier.Classic
-    }
-    if PublishingOptions.current == .testFlight {
-      return CustomerTier.TestFlight
-    }
-
-    return CustomerTier.Free
+    // 强制返回 Plus 等级，解锁最高级功能
+    return CustomerTier.Plus
   }
 
   public func hasActiveSubscriptions() -> Bool {
     print(currentPlanName())
-    return customerTier() != CustomerTier.Free
+    return true  // 强制返回 true，解锁所有功能
   }
   
   public func groupsCheckViolation() -> Bool {

@@ -78,6 +78,11 @@ fileprivate extension EntitlementPeriodType {
 }
 
 func configureRevCat() {
+  // 内购功能已禁用 - 解锁版本
+  print("🔓 RevenueCat 已禁用 - 使用解锁版本")
+  
+  // 注释掉实际的 RevenueCat 配置以避免网络请求
+  /*
   Purchases.logLevel = .debug
   let cfg = Configuration
     .builder(withAPIKey: XCConfig.infoPlistRevCatPubliKey())
@@ -86,4 +91,5 @@ func configureRevCat() {
     .build()
 
   Purchases.configure(with: cfg)
+  */
 }
